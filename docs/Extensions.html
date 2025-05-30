@@ -4909,9 +4909,12 @@ window.Quarto = {
   <ul>
   <li><a href="#extensions-of-the-model" id="toc-extensions-of-the-model" class="nav-link active" data-scroll-target="#extensions-of-the-model">Extensions to the model</a>
   <ul class="collapse">
-  <li><a href="#transmission-to-multiple-den-sites" id="toc-transmission-to-multiple-den-sites" class="nav-link" data-scroll-target="#transmission-to-multiple-den-sites">Transmission to multiple den sites</a></li>
+  <li><a href="#transmission-to-multiple-den-sites" id="toc-transmission-to-multiple-den-sites" class="nav-link" data-scroll-target="#transmission-to-multiple-den-sites">Transmission across multiple den sites</a></li>
+  <li><a href="#demographic-refinements" id="toc-demographic-refinements" class="nav-link" data-scroll-target="#demographic-refinements">Demographic Refinements</a></li>
+  <li><a href="#age-dependent-mortality" id="toc-age-dependent-mortality" class="nav-link" data-scroll-target="#age-dependent-mortality">Age-Dependent Mortality</a></li>
   <li><a href="#cross-species-transmission" id="toc-cross-species-transmission" class="nav-link" data-scroll-target="#cross-species-transmission">Cross-species transmission</a></li>
   </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
 </nav>
@@ -4950,15 +4953,51 @@ window.Quarto = {
 <section id="extensions-of-the-model" class="level1">
 <h1>Extensions to the model</h1>
 <section id="transmission-to-multiple-den-sites" class="level2">
-<h2 class="anchored" data-anchor-id="transmission-to-multiple-den-sites">Transmission to multiple den sites</h2>
+<h2 class="anchored" data-anchor-id="transmission-to-multiple-den-sites">Transmission across multiple den sites</h2>
+<p>While the current model simulates TB dynamics within a single possum den, real-world populations are spatially structured. <strong>Extending the model to multiple dens</strong> would allow for a more realistic representation of disease spread across a landscape.</p>
+<p>To implement this, we would:</p>
+<ul>
+<li><p><strong>Duplicate compartmental structures</strong> for each den (e.g., <span class="math inline">\(S_{J1}\)</span>, <span class="math inline">\(E_{J1}\)</span>, <span class="math inline">\(I_{J1}\)</span> for den 1, and so on).</p></li>
+<li><p>Introduce <strong>between-den transmission</strong>, governed by a new parameter (e.g., <span class="math inline">\(\beta_{\text{between}}\)</span>), representing low-probability contact between individuals from different dens.</p></li>
+<li><p>Include <strong>age-dependent migration</strong> between dens. Migration could be modeled as:</p>
+<ul>
+<li><p>Primarily occurring in <strong>adults</strong>, reflecting territorial expansion or dispersal behavior.</p></li>
+<li><p>Parameterized by a migration rate <span class="math inline">\(\mu_{\text{mig}}\)</span> for adults, influencing transitions like <span class="math inline">\(S_{A1} \rightarrow S_{A2}\)</span></p></li>
+</ul></li>
+</ul>
+<p>This spatial extension would allow exploration of <strong>local outbreaks</strong>, <strong>pathogen persistence</strong>, and the impact of <strong>targeted control strategies</strong> (e.g., selective culling or vaccination in high-prevalence dens).</p>
+</section>
+<section id="demographic-refinements" class="level2">
+<h2 class="anchored" data-anchor-id="demographic-refinements">Demographic Refinements</h2>
+<ul>
+<li><p>The current model assumes a birth rate of 5/year across all adults. However, <strong>female brushtail possums typically have only one offspring per year</strong>.</p>
+<ul>
+<li><p>Updating the model to include <strong>sex structure</strong> or a <strong>reduced per capita birth rate</strong> could improve biological realism.</p></li>
+<li><p>To explore high-density scenarios, it may be useful to simulate outcomes under <strong>higher birth rates</strong>, assessing whether rapid population turnover increases or suppresses TB transmission.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="age-dependent-mortality" class="level2">
+<h2 class="anchored" data-anchor-id="age-dependent-mortality">Age-Dependent Mortality</h2>
+<p>Although some simulations incorporated different mortality rates for juveniles and adults, this could be <strong>refined further</strong> with <strong>age-specific survival curves</strong> or <strong>seasonal survival shifts</strong>, reflecting real-world ecological pressures (e.g., food scarcity, predation).</p>
 </section>
 <section id="cross-species-transmission" class="level2">
 <h2 class="anchored" data-anchor-id="cross-species-transmission">Cross-species transmission</h2>
-<p>The model could be expanded to explore additional scenarios. Although this model is limited to one den, examining the transmission dynamics of multiple dens would be useful. In addition, female possums typically only have one offspring per year, a birth rate of 5 per year in a den of 50 possums appears low, and modelling the same scenario with a higher birth rate could be an interesting exercise. The increased vulnerability of juvenile possums to all causes of mortality should also be modelled, as their natural mortality rate is likely to be higher than adult possums. Finally, the role of brushtail possums in the aerosol transmission of bovine TB has important ramifications for New Zealand’s cattle industry. Building on the model of cross-species transmission of TB bovine TB in cattle and bison populations presented by Phepa et al. (2016) may provide a further opportunity to explore local transmission dynamics.</p>
-
-
-
+<p>The <strong>role of possums as vectors of bovine TB to cattle</strong> has major implications for New Zealand’s livestock industry. Future extensions could incorporate:</p>
+<ul>
+<li><p>A <strong>second host population</strong> (e.g., cattle), with its own compartments (e.g., <span class="math inline">\(S_C\)</span>, <span class="math inline">\(E_C\)</span>, <span class="math inline">\(I_C\)</span>).</p></li>
+<li><p><strong>Cross-species transmission terms</strong>, possibly via shared environments (e.g., contaminated pasture) or aerosol pathways.</p></li>
+<li><p>Building on models such as that by <strong>Phepa et al. (2016)</strong> for TB dynamics in cattle and bison, incorporating interaction rates and interspecies transmission coefficients.</p></li>
+</ul>
 </section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<p>Nugent, G., Buddle, B. M., &amp; Knowles, G. (2015). Epidemiology and control of Mycobacterium bovis infection in brushtail possums (Trichosurus vulpecula), the primary wildlife host of bovine tuberculosis in New Zealand. <em>New Zealand Veterinary Journal, 63</em>, 28-41. https://doi.org/10.1080/00480169.2014.963791</p>
+<p>Phepa, P. B., Chirove, F., &amp; Govinder, K. S. (2016). Modelling the role of multi-transmission route in the epidemiology of bovine tuberculosis in cattle and buffalo populations. <em>Mathematical Biosciences, 277</em>, 47-58. https://doi.org/10.1016/j.mbs.2016.04.003</p>
+
+
+
 </section>
 
 </main> <!-- /main -->
