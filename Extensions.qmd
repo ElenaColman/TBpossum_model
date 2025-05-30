@@ -1,0 +1,25 @@
+---
+title: "Extensions to the model"
+author: "Elena Colman & Fiona Harris"
+format:
+  html:
+    theme: 
+      - flatly
+    page-layout: full
+    toc: true
+    toc-location: left
+    math: mathjax
+    code-fold: true
+    code-summary: "Show code"
+    page-navigation: true
+    embed-resources: true
+editor: visual
+---
+
+# Extensions to the model {#extensions-of-the-model}
+
+## Transmission to multiple den sites {#transmission-to-multiple-den-sites}
+
+## Cross-species transmission {#cross-species-transmission}
+
+The model could be expanded to explore additional scenarios. Although this model is limited to one den, examining the transmission dynamics of multiple dens would be useful. In addition, female possums typically only have one offspring per year, a birth rate of 5 per year in a den of 50 possums appears low, and modelling the same scenario with a higher birth rate could be an interesting exercise. The increased vulnerability of juvenile possums to all causes of mortality should also be modelled, as their natural mortality rate is likely to be higher than adult possums. Finally, the role of brushtail possums in the aerosol transmission of bovine TB has important ramifications for New Zealand’s cattle industry. Building on the model of cross-species transmission of TB bovine TB in cattle and bison populations presented by Phepa et al. (2016) may provide a further opportunity to explore local transmission dynamics.

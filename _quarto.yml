@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: docs
+  
+website:
+  title: "Modelling TB in possum populations"
+  navbar:
+    left:
+      - text: Introduction
+        file: Index.qmd
+      - text: Transmission rate
+        file: Transmission_model.qmd
+      - text: Mortality rate
+        file: Mortality_model.qmd
+      - text: Carrying capacity
+        file: Carrying_capacity.qmd
+      - text: Additional remarks
+        file: Additional_remarks.qmd
+      - text: Extenstions to the model
+        file: Extensions.qmd
+
+format:
+  html:
+    toc: true
+    toc-location: left
+    theme: flatly
+    code-fold: true
+    code-summary: "Show code"
+    page-layout: full
+    page-navigation: true
+    embed-resources: true

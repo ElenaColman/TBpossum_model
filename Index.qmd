@@ -1,0 +1,331 @@
+---
+title: "Practicum 2: Modelling TB in possum populations"
+author: "Elena Colman & Fiona Harris"
+format:
+  html:
+    toc: true
+    toc-location: left
+    theme: flatly
+    math: mathjax
+    code-fold: true
+    code-summary: "Show code"
+    page-layout: full
+    page-navigation: true
+    main-container: true
+editor: visual
+---
+
+# Introduction
+
+In this practicum, we explore the transmission dynamics of bovine tuberculosis (TB) in a key wildlife reservoir—the Australian brushtail possum. Once infected, possums remain infectious for life, acting as a persistent source of disease. Transmission occurs through several pathways: direct contact during mating or fighting, indirect contact via shared den sites, and vertical transmission from mother to young while in the pouch.
+
+The possum population is structured into juveniles and adults, with juveniles maturing at a fixed rate regardless of infection status. Population growth is influenced by density-dependent factors, with birth and mortality rates affected by competition for limited resources within home sites. Transmission of infection occurs both through direct contact at a relatively high rate and vertically at a lower rate that depends on population pressure. Infected individuals experience elevated mortality, and after a short latent period, they become infectious for the remainder of their lives.
+
+This model integrates population dynamics and disease transmission to explore the conditions under which TB persists in possum populations, providing a basis for understanding and potentially managing wildlife disease reservoirs.
+
+### Baseline model assumptions
+
+-   **Vertical transmission occurs only from infectious mothers**; exposed (latent) mothers do not transmit the disease to their young.
+
+    -   **Gender is not explicitly modeled** in vertical transmission.
+
+-   **There is no movement or migration between dens**; the home site is treated as a closed population with no external mixing.
+
+-   **Contact rates are uniform across all age groups**, with no preferential mixing or social structure considered.
+
+-   **The transmission rate is assumed to be the same for all types of contact**, with no heterogeneity between individuals or subgroups.
+
+-   **Natural and tuberculosis-induced mortality rates are not age-dependent**; juveniles and adults are subject to the same baseline death rates.
+
+-   **Exposed (latent) individuals do not transmit the disease**, either through contact or vertically.
+
+-   **Asymptomatic transmission is not included** in this model.
+
+## Mathematical model {#mathematical-model}
+
+### Model diagram {#model-diagram}
+
+![Base model diagram](www/Basemodel.png)
+
+### Differential equations {#differential-equations}
+
+$$
+\begin{align}
+\text{Total births} &= \lambda X (S_{A} + E_{A} + I_{A}) \\
+\text{Susceptible birth rate} &= \lambda X (S_{A} + E_{A}) + \lambda X I_{A}(1 - \delta) \\
+\text{Exposed birth rate} &= \lambda X I_{A} \delta \\
+\frac{dS_J}{dt} &= \lambda X (S_{A} + E_{A}) + \lambda X I_{A}(1 - \delta) - (\mu Y + \gamma) S_J - r \beta \left( \frac{I_J}{N_J} + \frac{I_A}{N_A} \right) S_J \\
+\frac{dE_J}{dt} &= \lambda X I_{A} \delta + r \beta \left( \frac{I_J}{N_J} + \frac{I_A}{N_A} \right) S_J - (\mu Y + \gamma) E_J - \alpha E_J \\
+\frac{dI_J}{dt} &= \alpha E_J - (\mu Y + \gamma + \tau) I_J \\
+\frac{dS_A}{dt} &= \gamma S_J - \mu Y S_A - r \beta \left( \frac{I_J}{N_J} + \frac{I_A}{N_A} \right) S_A \\
+\frac{dE_A}{dt} &= r \beta \left( \frac{I_J}{N_J} + \frac{I_A}{N_A} \right) S_A + \gamma E_J - (\mu Y + \alpha) E_A \\
+\frac{dI_A}{dt} &= \gamma I_J + \alpha E_A - (\mu Y + \tau) I_A
+\end{align}
+$$
+
+| Symbol | Parameter Name | Explanation | Value |
+|----|----|----|----|
+| λ | lambda | Per capita annual birth rate | 5 per year |
+| κ | kappa | Carrying capacity (max possums per den) | 50 |
+| ρ | rho | Dimensionless parameter for density effects | 0.5 |
+| μ | mu | Natural mortality rate (population-modified) | 1/5 per year |
+| τ | tau | TB-induced mortality rate | 1 per year |
+| γ | gamma | Maturation rate (juveniles to adults) | 1 per year |
+| α | alpha | Latency rate (exposed to infectious) | 5 per year |
+| rβ | r beta | Contact transmission rate | 2.1 per year |
+| δ | delta | Vertical transmission rate | 0.1 |
+
+: Model’s parameters {#tableparameters}
+
+| Symbol | Modifier Name | Explanation | Formula |
+|----|----|----|----|
+| Y | Mortality modifier | Increases mortality with crowding (logistic function) | \\( Y = \\frac{1}{1 + \\exp(-\\rho(N_J + N\_{Ad} - \\kappa))} \\) |
+| X | Birth rate modifier | Reduces birth rate based on total population | \\( X = 1 - Y \\) |
+
+: Model’s modifiers {#tablemodifiers}
+
+# Baseline infection model {#baseline-infection-model}
+
+## Infection dynamics {#infection-dynamics}
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#install.packages("deSolve")  # Run this only once
+
+library(deSolve)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(knitr)
+library(shiny)
+
+```
+
+The start population is a total of 50 possums: 20 juveniles and 30 adults. The model starts when 1 infectious adult is introduced to the den.
+
+```{r}
+#| echo: false
+#defining base model
+
+
+possum_model <- function(time, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    
+    
+    NJ <- SJ + EJ + IJ
+    NAd <- SAd + EAd + IAd
+    N <- NJ + NAd
+    #change to the mortality per capity in relation to the population size
+    Y = (1/ (1+exp(- rho * (NJ+NAd-kappa))))
+    #per capita growth rate change
+    X = 1 - Y
+    #vertical transmission
+    delta = 0.1    #vertical transmission
+    
+    #birth
+    births_total <- (X*lambda*(SAd + EAd + IAd))
+    birth_SJ <- (X*lambda * (SAd + EAd)+lambda*X*IAd *(1-delta))
+    births_EJ <- (X*lambda*delta*IAd)
+    
+    
+    
+    #transmission
+    infection <- (r_beta * (IJ/NJ + IAd/NAd))
+    
+    #differential equations - added Y for added mortality
+    
+    dSJ <- ((birth_SJ) - ((mu * Y + gammma) * SJ) - (infection * SJ))
+    dEJ <- ((infection * SJ) + (births_EJ) - ((mu * Y + gammma + alpha) * EJ))
+    dIJ <- ((alpha * EJ) - (mu * Y + gammma + tau) * IJ)
+    
+    dSAd <- ((gammma * SJ) - ((mu * Y) * SAd) - (infection * SAd))
+    dEAd <- ((gammma * EJ) + (infection * SAd) - ((mu* Y + alpha) * EAd))
+    dIAd <- ((gammma * IJ) + (alpha * EAd) - ((mu * Y + tau) * IAd))
+    
+    # Calculate deaths
+    natural_deaths <- mu * Y * (SJ + EJ + IJ + SAd + EAd + IAd)
+    tb_deaths <- tau * (IJ + IAd)
+    
+    # Return deaths as extra outputs
+    return(list(c(dSJ, dEJ, dIJ, dSAd, dEAd, dIAd),
+                natural_deaths = natural_deaths,
+                tb_deaths = tb_deaths))
+    
+  })
+}
+
+
+
+#initial population
+
+baseyiniValues = c(
+  SJ = 20,
+  EJ = 0,
+  IJ = 0,
+  SAd = 30,
+  EAd = 0,
+  IAd = 1     # 1 infected possum arrives in the den
+)
+
+
+
+# Parameters (per year)
+baseparameters <- c(
+  r_beta = 2.1,    # Transmission rate
+  lambda = 5,      # birth rate
+  kappa = 50,           #carrying capacity
+  rho = 0.5,            #no idea
+  mu = 1/5 ,      #natural mortality
+  tau = 1,         #TB mortality
+  gammma = 1,      #maturity rate
+  alpha = 5        #latent infectious period
+)
+
+```
+
+```{r}
+#| echo: false
+
+##7.5years
+
+# Time sequence
+basetimesequence7years <- seq(0, 7.5, by = 0.1)  # simulate for 7.5 years
+
+#running model 
+baseoutput7year <- deSolve::ode(y = baseyiniValues, times = basetimesequence7years, 
+                             func = possum_model, parms = baseparameters)
+baseoutput7year <- as.data.frame(baseoutput7year)
+
+summary(baseoutput7year)
+# Head and Tail
+kable(head(baseoutput7year), caption = "First 6 Rows of Model Output")  
+kable(tail(baseoutput7year), caption = "Last 6 Rows of Model Output")  
+
+
+
+
+```
+
+```{r}
+#| echo: false
+
+
+baseoutput7 <- ode(y = baseyiniValues, times = basetimesequence7years, func = possum_model, parms = baseparameters)
+baseoutput7_df <- as.data.frame(baseoutput7)
+
+# Convert to long format for plotting
+baseoutput7_long <- baseoutput7_df %>%
+  pivot_longer(cols = -time, names_to = "Compartment", values_to = "Count") %>%
+  filter(Compartment %in% c("SJ", "EJ", "IJ", "SAd", "EAd", "IAd"))  %>%
+  mutate(Compartment = recode(Compartment,
+    "SJ" = "Susceptible Juveniles",
+    "EJ" = "Exposed Juveniles",
+    "IJ" = "Infectious Juveniles",
+    "SAd" = "Susceptible Adults",
+    "EAd" = "Exposed Adults",
+    "IAd" = "Infectious Adults"
+  ))
+
+
+# Plot
+
+ggplot(baseoutput7_long, aes(x = time, y = Count, color = Compartment)) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Bovine TB in possum population over time",
+    subtitle = "Baseline model",
+    x = "Time (Years)",
+    y = "Number of possums"
+  ) +
+  theme_minimal()
+
+
+```
+
+Review: per timestep
+
+·       YEAR 0-1: initial increase in Sj due to births and low amount of infected individuals. Fast decrease due to maturation (**can we check where they go**?) ; Sad has exponential growth due to maturing Sj and reaches it’s peak after 1 year; EJ and Ead pick up very slowly in the first year, Ead are double the population size; Iad stays constant until halfway the first year it then increases very slowly. Ij is equal to Ej.
+
+·       YEAR 1-3: Sj decrease slows down due exposure, exposed births and mortality and finds stability around 10 after the second year.; Sad decreases exponentially until the 3^rd^ year due to the infection picking up in both age groups.; Ej slowly picks up and stabilises around 5 after 5 years.; Ead finds its maximum around 5 at 2,5years after which it decreases to 3 around 4,5years.; Ij increases over time and surpasses Sj around 5 years after which it stabilises around 11.; Iad has an exponential increase from 0-2 and slows down between 2 and 4 after which it stabilises around 21.
+
+·       **Idea graph the deaths per group**
+
+```{r}
+#| echo: false
+##Total population over time
+
+baseoutput7_df$total_population <- rowSums(baseoutput7_df[, c("SJ", "EJ", "IJ", "SAd", "EAd", "IAd")])
+maxpopulationBaseline <- max(baseoutput7_df$total_population)
+timeAtMaxPopBaseline <- baseoutput7_df$time[which.max(baseoutput7_df$total_population)]
+
+# Plot
+# Add total population column (already done)
+baseoutput7_df$total_population <- rowSums(baseoutput7_df[, c("SJ", "EJ", "IJ", "SAd", "EAd", "IAd")])
+
+# Plot total population over time
+ggplot(baseoutput7_df, aes(x = time, y = total_population)) +
+  geom_line(color = "blue", linewidth = 1.2) +
+  labs(
+    title = "Total possum population over time",
+    subtitle = "Baseline model",
+    x = "Time (Years)",
+    y = "Total number of possums"
+  ) +
+   annotate("point", x = timeAtMaxPopBaseline, y = maxpopulationBaseline, color = "red", size = 3) +
+  annotate("text", x = timeAtMaxPopBaseline, y = maxpopulationBaseline,
+           label = paste0("Peak: ", round(maxpopulationBaseline), "\nYear ", round(timeAtMaxPopBaseline, 1)),
+           vjust = -1, hjust = 0.5, color = "red", size = 3.5)+
+  theme_minimal()
+
+```
+
+The maximum population in the baseline model was `r maxpopulationBaseline` possums reached at `r timeAtMaxPopBaseline` years.
+
+```{r}
+#| echo: false
+##natural vs TB mortality
+
+# Reshape for plotting
+basemortality_long <- pivot_longer(baseoutput7_df,
+                               cols = c("natural_deaths", "tb_deaths"),
+                               names_to = "Mortality_Type",
+                               values_to = "Deaths") %>%
+    mutate(Mortality_Type = recode(Mortality_Type,
+                                 "natural_deaths" = "Natural Mortality",
+                                 "tb_deaths" = "TB Mortality"))
+
+# Plot both types of mortality
+ggplot(basemortality_long, aes(x = time, y = Deaths, color = Mortality_Type)) +
+  geom_line(linewidth = 1.2) +
+  labs(
+    title = "Natural vs TB Mortality over time",
+    subtitle = "Baseline model",
+    x = "Time (Years)",
+    y = "Deaths per unit time",
+    color = "Type of mortality"
+  ) +
+  theme_minimal()
+```
+
+### Exploring the Initial Increase in $S_J$ (Susceptible Juveniles) {#exploring-the-initial-increase-in-s_j-susceptible-juveniles}
+
+In the baseline simulation, we observe that the number of susceptible juveniles ($S_J$) increases slightly during the first few time steps, despite the presence of processes that remove individuals from this compartment such as infection, maturation, and mortality.
+
+This behavior can be explained by examining the structure of the differential equation governing $S_J$:
+
+$$
+\frac{dS_J}{dt} = \lambda X (S_A + E_A) + \lambda X \cdot I_A \cdot (1 - \delta) - (\mu Y + \gamma) S_J - r \beta \left( \frac{I_J}{N_J} + \frac{I_A}{N_A} \right) S_J
+$$
+
+Here, $S_J$ increases due to births from susceptible, exposed, and infectious adults (the first two terms), and decreases due to maturation, natural mortality, and transmission (the final three terms).
+
+At the start of the simulation:
+
+-   The infectious compartments $I_J$ and $I_A$ are very small (or zero), so the **force of infection is initially weak**.
+-   The number of susceptible adults ($S_A$) is relatively large, contributing to a **high birth input** into the juvenile class.
+-   The **birth rate modifier** $X$ is close to 1 early on, since the total population is well below the carrying capacity, making births highly efficient.
+-   Losses from $S_J$ due to maturation ($\gamma$) and mortality ($\mu Y$) are moderate, and the population-level modifier $Y$ is still small.
+
+As a result, the influx of newborn susceptibles exceeds the outflows from the compartment in the first few time steps, leading to a brief initial increase in $S_J$. As the simulation progresses, the infectious population grows, the force of infection strengthens, and population pressures increase. This leads to higher losses from $S_J$ through infection, maturation, and density-dependent mortality, eventually reversing the early growth trend.

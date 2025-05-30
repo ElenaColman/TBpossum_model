@@ -1,0 +1,174 @@
+---
+title: "Carrying capacity"
+author: "Elena Colman & Fiona Harris"
+format:
+  html:
+    theme: 
+      - flatly
+    page-layout: full
+    toc: true
+    toc-location: left
+    math: mathjax
+    code-fold: true
+    code-summary: "Show code"
+    page-navigation: true
+    embed-resources: true
+editor: visual
+---
+
+# Carrying capacity
+
+## What is the effect of the carrying capacity?
+
+
+
+```{r}
+#| context: server
+#| echo: false
+#| warning: false
+#| message: false
+
+library(deSolve)
+library(tidyr)
+library(dplyr)
+library(purrr)
+
+KappaModel <- function(time, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    NJ <- SJ + EJ + IJ
+    NAd <- SAd + EAd + IAd
+    Y = 1 / (1 + exp(- rho * (NJ + NAd - kappa)))
+    X = 1 - Y
+    delta = 0.1
+    infection <- r_beta * (IJ / NJ + IAd / NAd)
+
+    birth_SJ <- X * lambda * (SAd + EAd) + lambda * X * IAd * (1 - delta)
+    births_EJ <- X * lambda * delta * IAd
+
+    dSJ <- birth_SJ - (mu * Y + gammma) * SJ - infection * SJ
+    dEJ <- infection * SJ + births_EJ - (mu * Y + gammma + alpha) * EJ
+    dIJ <- alpha * EJ - (mu * Y + gammma + tau) * IJ
+    dSAd <- gammma * SJ - mu * Y * SAd - infection * SAd
+    dEAd <- gammma * EJ + infection * SAd - (mu * Y + alpha) * EAd
+    dIAd <- gammma * IJ + alpha * EAd - (mu * Y + tau) * IAd
+
+    natural_deaths <- mu * Y * (SJ + EJ + IJ + SAd + EAd + IAd)
+    tb_deaths <- tau * (IJ + IAd)
+
+    return(list(c(dSJ, dEJ, dIJ, dSAd, dEAd, dIAd),
+                natural_deaths = natural_deaths,
+                tb_deaths = tb_deaths))
+  })
+}
+
+yini <- c(SJ = 20, EJ = 0, IJ = 0, SAd = 30, EAd = 0, IAd = 1)
+times <- seq(0, 7.5, by = 0.1)
+
+kappa_grid <- tidyr::expand_grid(
+  kappa = seq(10, 100, by = 5)
+)
+
+kappa_sim <- kappa_grid |>
+  rowwise() |>
+  mutate(sim = list(as.data.frame(
+    ode(y = yini, times = times, func = KappaModel,
+        parms = c(
+          r_beta = 2.1, lambda = 5, rho = 0.5,
+          mu = 1/5, tau = 1, gammma = 1, alpha = 5, kappa = kappa
+        ))
+  ))) |>
+  unnest(sim) |>
+  ungroup()
+
+ojs_define(kappa_data = purrr::transpose(kappa_sim))
+
+```
+
+```{ojs}
+//| echo: false
+
+viewof kappa = Inputs.range([10, 100], {step: 5, label: "Carrying Capacity (κ)"})
+
+filteredKappa = kappa_data.filter(d => d.kappa === kappa)
+
+kappa_long = filteredKappa.flatMap(d => [
+  { time: d.time, Count: d.SJ, Compartment: "Susceptible Juveniles" },
+  { time: d.time, Count: d.EJ, Compartment: "Exposed Juveniles" },
+  { time: d.time, Count: d.IJ, Compartment: "Infectious Juveniles" },
+  { time: d.time, Count: d.SAd, Compartment: "Susceptible Adults" },
+  { time: d.time, Count: d.EAd, Compartment: "Exposed Adults" },
+  { time: d.time, Count: d.IAd, Compartment: "Infectious Adults" }
+])
+
+kappa_mortality = filteredKappa.flatMap(d => [
+  { time: d.time, Deaths: d.natural_deaths, Type: "Natural Mortality" },
+  { time: d.time, Deaths: d.tb_deaths, Type: "TB Mortality" }
+])
+
+
+kappa_total = filteredKappa.map(d => ({
+  time: d.time,
+  Total: d.SJ + d.EJ + d.IJ + d.SAd + d.EAd + d.IAd
+}))
+
+
+```
+
+```{ojs}
+//| echo: false
+
+html`<div style="display: flex; gap: 2rem;">
+  <div style="width: 250px;">
+    <p><strong>κ Slider</strong></p>
+    ${viewof kappa}
+    <p style="font-size: 0.9em;">Explore how carrying capacity κ affects population size and mortality.</p>
+  </div>
+
+  <div>
+    <h3>Compartment Dynamics</h3>
+    ${Plot.plot({
+      marks: [Plot.lineY(kappa_long, {x: "time", y: "Count", stroke: "Compartment"})],
+      color: {
+        type: "ordinal",
+        domain: [
+          "Susceptible Juveniles", "Exposed Juveniles", "Infectious Juveniles",
+          "Susceptible Adults", "Exposed Adults", "Infectious Adults"
+        ],
+        range: ["blue", "orange", "red", "green", "purple", "brown"],
+        legend: true
+      },
+      x: {label: "Time (Years)"},
+      y: {label: "Possum Count"},
+      width: 700,
+      height: 350
+    })}
+
+    <h3>Mortality Over Time</h3>
+    ${Plot.plot({
+      marks: [Plot.lineY(kappa_mortality, {x: "time", y: "Deaths", stroke: "Type"})],
+      color: {
+        type: "ordinal",
+        domain: ["Natural Mortality", "TB Mortality"],
+        range: ["green", "black"],
+        legend: true
+      },
+      x: {label: "Time (Years)"},
+      y: {label: "Deaths per Unit Time"},
+      width: 700,
+      height: 350
+    })}
+    <h3>Total Population Over Time</h3>
+${Plot.plot({
+  marks: [Plot.lineY(kappa_total, {x: "time", y: "Total"})],
+  color: {value: "steelblue"},
+  x: {label: "Time (Years)"},
+  y: {label: "Total Possums"},
+  width: 700,
+  height: 300
+})}
+
+  </div>
+</div>`
+
+```
+
