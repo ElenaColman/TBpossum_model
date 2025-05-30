@@ -20,7 +20,18 @@ editor: visual
 
 ## What is the effect of the carrying capacity?
 
+The carrying capacity, denoted by $\kappa$, represents the maximum number of possums the den can support. It acts as a **population cap**, influencing birth rates through density-dependent feedback. As the population approaches or exceeds this threshold, birth rates decrease to reflect environmental limitations like food, space, or disease pressure.
 
+In the model, this feedback is governed by the logistic modifier:
+
+| Symbol | Modifier Name | Explanation | Formula |
+|------------------|------------------|------------------|------------------|
+| $Y$ | Mortality modifier | Increases mortality with crowding (logistic function) | \\( Y = \\frac{1}{1 + \\exp(-\\rho(N_J + N\_{Ad} - \\kappa))} \\) |
+| $X$ | Birth rate modifier | Reduces birth rate based on total population | \\( X = 1 - Y \\) |
+
+: :Model’s modifiers {#tablemodifiers}
+
+Here, $N$ is the total population, and $\rho$ determines how sharply the birth rate is reduced as $N$ approaches $\kappa$.
 
 ```{r}
 #| context: server
@@ -119,13 +130,25 @@ kappa_total = filteredKappa.map(d => ({
 
 html`<div style="display: flex; gap: 2rem;">
   <div style="width: 250px;">
-    <p><strong>κ Slider</strong></p>
+    <p><strong>Carrying capacity κ </strong></p>
     ${viewof kappa}
-    <p style="font-size: 0.9em;">Explore how carrying capacity κ affects population size and mortality.</p>
+    <p style="font-size: 0.9em;">
+    <strong>Key patterns:</strong><br>
+
+    <strong>Low carrying capacity</strong> leads to rapid stabilization at smaller population sizes. High mortality or infection may cause populations to dip below the threshold needed for replacement.
+
+    <strong>High carrying capacity</strong> allows for prolonged growth, with population peaks near or above 50. This can intensify transmission and TB mortality as more individuals are present to sustain spread.
+
+    The carrying capacity directly limits total population size, but indirectly influences infection dynamics, as larger populations lead to more contacts and potentially higher disease burden.
+
+    Mortality patterns shift with population density. At higher densities, both natural and TB-induced mortality tend to rise due to more crowding and interaction.
+    
+    <strong>Please note</strong> that neither the parameters or initial population settings were changed which can cause an initial peak or fall in numbers.
+    </p>
   </div>
 
   <div>
-    <h3>Compartment Dynamics</h3>
+    <h3>TB infection model</h3>
     ${Plot.plot({
       marks: [Plot.lineY(kappa_long, {x: "time", y: "Count", stroke: "Compartment"})],
       color: {
@@ -171,4 +194,3 @@ ${Plot.plot({
 </div>`
 
 ```
-

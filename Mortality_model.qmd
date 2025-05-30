@@ -1,5 +1,5 @@
 ---
-title: "Mortality model"
+title: "Mortality rate"
 author: "Elena Colman & Fiona Harris"
 format:
   html:
@@ -16,11 +16,23 @@ format:
 editor: visual
 ---
 
-## Quarto
+# Mortality rate
 
-pread.
+## What happens if the mortality rate is dependent on the age groups?
 
-![Mortality dependent on age groups](Change%20in%20mortality%20rate.png)
+![Mortality dependent on age groups](www/Changeinmortalityrate.png)
+
+To explore the effects of age-specific mortality on TB dynamics, we adapted the model to allow different natural and disease-induced death rates for juveniles and adults. This modification can reflect biological differences such as increased vulnerability in young possums and resilience in older individuals.
+
+-   Natural mortality in juveniles: $\mu_1$
+
+-   Natural mortality in adults: $\mu_2$
+
+-   TB-specific mortality in juveniles: $\tau_1$
+
+-   TB-specific mortality in adults: $\tau_2$
+
+The sliders below offer a way to simulate realistic demographic vulnerabilities in a possum den and observe how age-specific survival shapes epidemic outcomes.
 
 ```{r}
 #| context: server 
@@ -166,12 +178,24 @@ compartment_mortality = filteredMortality.flatMap(d => [
 
 html`<div style="display: flex; gap: 2rem;">
   <div style="width: 250px;">
-    <p><strong>Mortality Sliders</strong></p>
+    <p><strong>Mortality rates</strong></p>
     ${viewof tau1}
     ${viewof tau2}
     ${viewof mu1}
     ${viewof mu2}
-    <p style="font-size: 0.9em;">Explore how changes in natural and TB-specific mortality influence dynamics in the possum population.</p>
+    <p style="font-size: 0.9em;">
+<strong>Key patterns:</strong>
+<strong>Higher juvenile TB mortality</strong> tends to reduce the number of infectious juveniles. In extreme cases, this can nearly eliminate infection in juveniles due to early death before transmission.
+
+<strong>Increasing juvenile natural mortality </strong> has a compounding effect, reducing the total number of young possums—especially susceptible ones—and shifting the population structure toward adults.
+
+<strong>Adult TB mortality</strong> strongly influences the total number of infectious adults. High values lead to rapid declines in $I_A$, which can reduce overall TB burden but may also decrease population size if too many breeding adults die.
+
+<strong>Adult natural mortality</strong> moderates long-term population dynamics. Higher rates lower the number of adults, and if combined with low juvenile survival, can lead to population decline.
+
+<strong>Total TB mortality</strong> tends to be more sensitive to changes in adult parameters due to the larger initial adult population, though juveniles can disproportionately contribute when (${tex`\tau_1`}) is high.
+    
+    </p>
   </div>
 
   <div>

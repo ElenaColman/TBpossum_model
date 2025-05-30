@@ -20,15 +20,15 @@ editor: visual
 
 ## What happens if the transmission rate is dependent on the age groups?
 
-![Model diagram: age-dependent transmission rates](Change in transmission rate.png)
+\![![Diagram: Age-dependent transmission rates](www/Changeintransmissionrate.png)
 
-To examine the impact of age-specific transmission dynamics, we modified the model to account for different contact patterns between juveniles and adults. Instead of using a single uniform transmission rate across all age groups, we introduced three distinct contact rates to reflect behavioral differences with following transmission rate values:
+To examine the impact of age-specific transmission dynamics, we modified the model to account for different contact patterns between juveniles and adults. Instead of using a single uniform transmission rate across all age groups, we introduced three distinct contact rates to reflect behavioral differences:
 
 -   **Juvenile-to-juvenile** transmission (e.g., through play and nesting interactions): $r_{\beta 1}$
 -   **Adult-to-adult** transmission (e.g., through breeding and fighting): ${r_\beta 2}$
 -   **Cross-age** transmission between juveniles and adults (less frequent interaction): $r_{\beta 3}$
 
-These values allow us to explore how increased transmission among adults (e.g., due to aggressive behaviors) might influence infection dynamics in the overall population, and how juvenile–adult interactions contribute to disease spread.
+Overall, adjusting these parameters provides insight into how age-structured social behavior can shape disease outcomes in a population.
 
 ```{r}
 #| context: server
@@ -168,7 +168,7 @@ compartment_long = filtered.flatMap(d => [
 
 html`<div style="display: flex; gap: 2rem;"> 
   <div style="width: 250px; flex-shrink: 0;">
-    <p><strong>Transmission Sliders</strong></p>
+    <p><strong>Transmission rates</strong></p>
     <p style="font-size: 0.9em;">
     Adjust the <code>r_beta</code> values to simulate how age-dependent transmission affects TB dynamics in the possum population.
   </p>
@@ -177,18 +177,25 @@ html`<div style="display: flex; gap: 2rem;">
     ${viewof r_beta3}
     
     <p style="font-size: 0.9em;">
-    The transmission between adults adjusts the speed with which the model reaches its' equlibrium, the transmission between juveniles changes the number of juvenile possums in each group. While adjusting the cross-age parameter, changes the time infection reaches its' peak. 
+<strong>Key patterns:</strong>
+
+    <strong>Susceptible juveniles</strong> often show early increases due to high birth rates and low initial infection pressure. Higher infection transmission values may lead to faster depletion of this group, while lower values delay infection spread among juveniles.
+
+    <strong>Adult compartments</strong> (especially infectious adults) tend to rise more rapidly with higher transmission, driving the epidemic early on. However, adult-to-adult transmission has a strong influence on how quickly the population reaches equilibrium.
+
+    <strong>Cross-age transmission</strong> plays a pivotal role in determining how infection bridges between the age groups. Higher values tend to synchronize infection curves, while lower values isolate spread within each age group.
+
+    TB mortality is most sensitive to changes in cross-age transmission, where higher transmission leads to higher overall infection burdens and deaths.
+
+    The peak population size is influenced by all three parameters, but especially by the balance between juvenile births and losses to infection and maturation.
     
-    The population in the den will influence the population peak and come close to 51 when adult and cross-age transmissions are high. Juvenile transmission will define the long-term stable population level.
-    
-    The largest contributing factor to the TB mortality is the value of the cross-age parameter.
   </p>
     
     
   </div>
 
   <div>
-      <h3>Age-dependent transmission rate</h3>
+      <h3>Age-dependent transmission rates</h3>
   <p><em>TB Infection Model</em></p>
   
     ${Plot.plot({

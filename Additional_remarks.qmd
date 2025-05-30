@@ -20,12 +20,17 @@ editor: visual
 
 ## Group heterogeneity {#group-heterogeneity}
 
+The model accounts for heterogeneity by distinguishing between juvenile and adult possums, allowing for different infection and mortality dynamics across age groups. While maturation and birth dynamics are age-specific, other simplifying assumptions—such as homogeneous mixing and fixed transition rates—are maintained to keep the model tractable.
+
 ## Possible control measures {#possible-control-measures}
 
-Widespread culling been introduced in New Zealand, where one field trial eliminated TB in both possums and cattle by reducing the possum population density by 78% (Nugent et al., 2015). To test this, a model was created that incorporate a cull rate of 80% into the natural mortality. In this model the total possum population decreased by 2 from a stable population of 52 to 50. after 10 years. The number of susceptible juveniles was much higher than in the base model (16 instead of 10) and stabilized later (at 6 years compared to 2). The number of susceptible adults exhibits a similar pattern, stabilizing at 9 instead of 4. Exposure rates remain similar, although the curve for exposed adults is flatter. There are approximately half as many infected juveniles and the number of infected adults decreased by 50% from 21 to 14. Overall, culling substantially reduced TB mortality in the population from 35 to 29, with a larger impact on adult possums. Natural mortality was much higher at all time steps due to the inclusion of culling, stabilizing at 24 possums per year.
+![Mortality dependent on age groups](www/Changeinmortalityrate.png)
 
+Culling has been widely implemented in New Zealand as a strategy to control bovine tuberculosis (TB) in wildlife. One field trial reported TB elimination in both possums and cattle after reducing possum population density by 78% (Nugent et al., 2015).
 
-![Mortality dependent on age groups](Change%20in%20mortality%20rate.png)
+To simulate this, we introduced a **culling rate of 80%** into the model **as an additive term to the natural mortality for adults**. This effectively increases mortality across infected and uninfected adults, mimicking real-world management interventions.
+
+Under this scenario, the total population declined only slightly over 10 years, but disease dynamics shifted notably. The number of susceptible juveniles increased and stabilized later, while susceptible adults also rose and plateaued at a higher level. Exposed compartments remained similar in shape but with flatter curves. Infections were notably reduced: the number of infected juveniles dropped by half, and infected adults declined from 21 to 14. TB mortality fell from 35 to 29 deaths, driven primarily by reductions in adult cases. Natural mortality increased due to the added culling pressure, stabilizing at 24 deaths per year.
 
 ```{r}
 #| context: server 
@@ -163,9 +168,13 @@ compartment_mortality = filteredMortality.flatMap(d => [
 
 html`<div style="display: flex; gap: 2rem;">
   <div style="width: 250px;">
-    <p><strong>Mortality Sliders</strong></p>
+    <p><strong>Culling rate</strong></p>
     ${viewof epsilon}
-    <p style="font-size: 0.9em;">Explore how changes in natural and TB-specific mortality influence dynamics in the possum population.</p>
+    <p style="font-size: 0.9em;">
+    
+    To assess the broader impact of management strategies, the model was extended with an interactive slider that allows exploration of culling rates from 0% to 100%. The tool highlights how even moderate adjustments to culling rates can shape long-term disease outcomes and demographic structure.
+    
+    </p>
   </div>
 
   <div>
@@ -224,25 +233,31 @@ html`<div style="display: flex; gap: 2rem;">
 
 
     <p><em>Mortality Over Time</em></p>
+    
     ${Plot.plot({
-      marks: [Plot.lineY(mortality_long, {
-      x: {label: "Time (Years)"},
-      y: {label: "Deaths per Unit Time"},
-      width: 700,
-      height: 350
-      })],
-      color: {
-  domain: [
-    "Natural mortality",
-    "Culling rate",
-    "TB Mortality"
-  ],
-  range: ["green", "red", "orange"],
-  type: "ordinal",
-  label: "Mortality Type",
-  legend: true
-}
-    })}
+  marks: [Plot.lineY(mortality_long, {
+    x: "time",
+    y: "Deaths",
+    stroke: "Type"
+  })],
+  color: {
+    domain: [
+      "Natural mortality",
+      "Culling rate",
+      "TB Mortality"
+    ],
+    range: ["green", "red", "orange"],
+    type: "ordinal",
+    label: "Mortality Type",
+    legend: true
+  },
+  x: { label: "Time (Years)" },
+  y: { label: "Deaths per Unit Time" },
+  width: 700,
+  height: 350
+})}
+
+   
   </div>
 </div>`
 
