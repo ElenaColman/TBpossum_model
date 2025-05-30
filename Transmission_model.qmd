@@ -20,7 +20,7 @@ editor: visual
 
 ## What happens if the transmission rate is dependent on the age groups?
 
-\![![Diagram: Age-dependent transmission rates](www/Changeintransmissionrate.png)
+![Diagram: Age-dependent transmission rates](www/Changeintransmissionrate.png)
 
 To examine the impact of age-specific transmission dynamics, we modified the model to account for different contact patterns between juveniles and adults. Instead of using a single uniform transmission rate across all age groups, we introduced three distinct contact rates to reflect behavioral differences:
 
@@ -177,15 +177,15 @@ html`<div style="display: flex; gap: 2rem;">
     ${viewof r_beta3}
     
     <p style="font-size: 0.9em;">
-<strong>Key patterns:</strong>
+<strong>Key patterns:</strong> <br>
 
-    <strong>Susceptible juveniles</strong> often show early increases due to high birth rates and low initial infection pressure. Higher infection transmission values may lead to faster depletion of this group, while lower values delay infection spread among juveniles.
+    <strong>Susceptible juveniles</strong> often show early increases due to high birth rates and low initial infection pressure. Higher infection transmission values may lead to faster depletion of this group, while lower values delay infection spread among juveniles. <br>
 
-    <strong>Adult compartments</strong> (especially infectious adults) tend to rise more rapidly with higher transmission, driving the epidemic early on. However, adult-to-adult transmission has a strong influence on how quickly the population reaches equilibrium.
+    <strong>Adult compartments</strong> (especially infectious adults) tend to rise more rapidly with higher transmission, driving the epidemic early on. However, adult-to-adult transmission has a strong influence on how quickly the population reaches equilibrium.<br>
 
-    <strong>Cross-age transmission</strong> plays a pivotal role in determining how infection bridges between the age groups. Higher values tend to synchronize infection curves, while lower values isolate spread within each age group.
+    <strong>Cross-age transmission</strong> plays a pivotal role in determining how infection bridges between the age groups. Higher values tend to synchronize infection curves, while lower values isolate spread within each age group.<br>
 
-    TB mortality is most sensitive to changes in cross-age transmission, where higher transmission leads to higher overall infection burdens and deaths.
+    TB mortality is most sensitive to changes in cross-age transmission, where higher transmission leads to higher overall infection burdens and deaths.<br>
 
     The peak population size is influenced by all three parameters, but especially by the balance between juvenile births and losses to infection and maturation.
     

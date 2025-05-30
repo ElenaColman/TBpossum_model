@@ -184,16 +184,16 @@ html`<div style="display: flex; gap: 2rem;">
     ${viewof mu1}
     ${viewof mu2}
     <p style="font-size: 0.9em;">
-<strong>Key patterns:</strong>
-<strong>Higher juvenile TB mortality</strong> tends to reduce the number of infectious juveniles. In extreme cases, this can nearly eliminate infection in juveniles due to early death before transmission.
+<strong>Key patterns:</strong><br>
+<strong>Higher juvenile TB mortality</strong> tends to reduce the number of infectious juveniles. In extreme cases, this can nearly eliminate infection in juveniles due to early death before transmission.<br>
 
-<strong>Increasing juvenile natural mortality </strong> has a compounding effect, reducing the total number of young possums—especially susceptible ones—and shifting the population structure toward adults.
+<strong>Increasing juvenile natural mortality </strong> reduces the total number of young possums—especially susceptible ones—and shifting the population structure toward adults.<br>
 
-<strong>Adult TB mortality</strong> strongly influences the total number of infectious adults. High values lead to rapid declines in $I_A$, which can reduce overall TB burden but may also decrease population size if too many breeding adults die.
+<strong>Adult TB mortality</strong> strongly influences the total number of infectious adults. High values lead to rapid declines in infected adults, which can reduce overall TB burden but may also decrease population size if too many breeding adults die.<br>
 
-<strong>Adult natural mortality</strong> moderates long-term population dynamics. Higher rates lower the number of adults, and if combined with low juvenile survival, can lead to population decline.
+<strong>Adult natural mortality</strong> moderates long-term population dynamics. Higher rates lower the number of adults, and if combined with low juvenile survival, can lead to population decline.<br>
 
-<strong>Total TB mortality</strong> tends to be more sensitive to changes in adult parameters due to the larger initial adult population, though juveniles can disproportionately contribute when (${tex`\tau_1`}) is high.
+<strong>Total TB mortality</strong> tends to be more sensitive to changes in adult parameters due to the larger initial adult population.
     
     </p>
   </div>

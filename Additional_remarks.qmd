@@ -30,7 +30,9 @@ Culling has been widely implemented in New Zealand as a strategy to control bovi
 
 To simulate this, we introduced a **culling rate of 80%** into the model **as an additive term to the natural mortality for adults**. This effectively increases mortality across infected and uninfected adults, mimicking real-world management interventions.
 
-Under this scenario, the total population declined only slightly over 10 years, but disease dynamics shifted notably. The number of susceptible juveniles increased and stabilized later, while susceptible adults also rose and plateaued at a higher level. Exposed compartments remained similar in shape but with flatter curves. Infections were notably reduced: the number of infected juveniles dropped by half, and infected adults declined from 21 to 14. TB mortality fell from 35 to 29 deaths, driven primarily by reductions in adult cases. Natural mortality increased due to the added culling pressure, stabilizing at 24 deaths per year.
+Under this scenario, the total population declined only slightly over 10 years, but disease dynamics shifted notably. Infections were reduced: the number of infected juveniles dropped by half, and infected adults declined by 1/3rd. TB mortality fell from 35 to 29 deaths, driven primarily by reductions in adult cases. Natural mortality increased due to the added culling pressure, stabilizing at 24 deaths per year.
+
+Culling interventions has had mixed outcomes due to the financial and ecological costs. Other control strategies are vaccination and isolation.
 
 ```{r}
 #| context: server 

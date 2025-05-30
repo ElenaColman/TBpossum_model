@@ -20,9 +20,7 @@ editor: visual
 
 ## Transmission across multiple den sites {#transmission-to-multiple-den-sites}
 
-While the current model simulates TB dynamics within a single possum den, real-world populations are spatially structured. **Extending the model to multiple dens** would allow for a more realistic representation of disease spread across a landscape.
-
-To implement this, we would:
+**Extending the model to multiple dens** would allow for a more realistic representation of disease spread across a landscape. To implement this, we would:
 
 -   **Duplicate compartmental structures** for each den (e.g., $S_{J1}$, $E_{J1}$, $I_{J1}$ for den 1, and so on).
 
@@ -32,17 +30,15 @@ To implement this, we would:
 
     -   Primarily occurring in **adults**, reflecting territorial expansion or dispersal behavior.
 
-    -   Parameterized by a migration rate $\mu_{\text{mig}}$ for adults, influencing transitions like $S_{A1} \rightarrow S_{A2}$
+    -   Parameter: migration rate $\sigma_{\text{mig}}$ for adults, influencing transitions like $S_{A1} \rightarrow S_{A2}$
 
 This spatial extension would allow exploration of **local outbreaks**, **pathogen persistence**, and the impact of **targeted control strategies** (e.g., selective culling or vaccination in high-prevalence dens).
 
 ## Demographic Refinements
 
--   The current model assumes a birth rate of 5/year across all adults. However, **female brushtail possums typically have only one offspring per year**.
+-   The current model assumes a birth rate of 5/year across all adults. However, **female brushtail possums typically have one offspring per year**.
 
-    -   Updating the model to include **sex structure** or a **reduced per capita birth rate** could improve biological realism.
-
-    -   To explore high-density scenarios, it may be useful to simulate outcomes under **higher birth rates**, assessing whether rapid population turnover increases or suppresses TB transmission.
+    -   Updating the model to include **sex structure** and **higher birth rates**, allows to assess whether rapid population turnover increases or suppresses TB transmission.
 
 ## Age-Dependent Mortality
 

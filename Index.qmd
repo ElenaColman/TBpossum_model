@@ -21,19 +21,17 @@ Common brushtail possums represent a key reservoir of bovine tuberculosis (TB) i
 
 This paper presents a mathematical model investigating the epidemic and disease dynamics of bovine TB in one den with 50 possums (30 adults and 20 juveniles) into which one infected individual is introduced. While the compartmental model (see below) includes heterogeneity between adults and juveniles **a number of assumptions are made** based on the information provided:
 
-1.  mortality is assumed to be the same for adults and juveniles,
+1.  Mortality is assumed to be the same for adults and juveniles;
 
-2.  the contact transmission rate is the same for all contacts,
+2.  The contact transmission rate is the same for all contacts;
 
-3.  vertical transmission to juvenile possums is not limited to females,
+3.  Vertical transmission to juvenile possums is not limited to females;
 
-4.  transmission does not occur during the latent period and there is no asymptomatic transmission, and
+4.  Transmission does not occur during the latent period and there is no asymptomatic transmission;
 
-5.  the den is a closed population, with no possums entering or leaving the den other than the first infected individual.
+5.  The den is a closed population, with no possums entering or leaving the den other than the first infected individual;
 
 6.  The birth rate differs between susceptible and exposed juveniles as only infected adults can birth exposed juveniles.
-
-A table of the parameters and modifiers is given below.
 
 ## Mathematical model {#mathematical-model}
 
@@ -58,7 +56,7 @@ $$
 $$
 
 | Symbol | Parameter Name | Explanation | Value | Unit |
-|----|----|----|----|----|
+|---------------|---------------|---------------|---------------|---------------|
 | λ | lambda | Per capita annual birth rate | 5 | per year |
 | κ | kappa | Carrying capacity | 50 | possums per den |
 | ρ | rho | Dimensionless parameter for density effects | 0.5 | (Dimensionless) |
@@ -72,7 +70,7 @@ $$
 : Model’s parameters {#tableparameters}
 
 | Symbol | Modifier Name | Explanation | Formula |
-|----|----|----|----|
+|----------------|------------------|------------------|----------------------|
 | Y | Mortality modifier | Increases mortality with crowding (logistic function) | \\( Y = \\frac{1}{1 + \\exp(-\\rho(N_J + N\_{Ad} - \\kappa))} \\) |
 | X | Birth rate modifier | Reduces birth rate based on total population | \\( X = 1 - Y \\) |
 
@@ -240,13 +238,17 @@ ggplot(baseoutput7_long, aes(x = time, y = Count, color = Compartment)) +
 At the start of the simulation:
 
 -   The infectious compartments $I_J$ and $I_A$ are very small (or zero), so the **force of infection is initially weak**.
--   The number of susceptible adults ($S_A$) is relatively large, contributing to a **high birth input** into the juvenile class.
+-   The number of susceptible adults is relatively large, contributing to a **high birth input** into the juvenile class.
 -   The **birth rate modifier** $X$ is close to 1 early on, since the total population is well below the carrying capacity, making births highly efficient.
 -   Losses from $S_J$ due to maturation ($\gamma$) and mortality ($\mu Y$) are moderate, and the population-level modifier $Y$ is still small.
 
-As a result, the influx of newborn susceptibles exceeds the outflows from the compartment in the first few time steps, leading to a brief initial increase in susceptible juveniles that quickly decreases due to maturation. This results in rapid growth in the susceptible adult population, which peaks after the first year.
+As a result, the influx of newborns exceeds the outflows from the compartment in the first few time steps, leading to a brief initial increase in susceptible juveniles that quickly decreases due to maturation. This results in rapid growth in the susceptible adult population, which peaks after the first year.
 
-The number of exposed individuals increases slowly during the first year, while the number of infected adults remains constant for the first 6 months before gradually increasing. In the following three years, the rate of increase in susceptible juveniles slows due to mortality, and an increase in the number of exposed juveniles. The number of susceptible adults decreases after the third year due to the increasing number of infected possums. The number of exposed juveniles stabilizes at around 5 after 5 years, while the number of exposed adults reaches a maximum of 5 after 2.5 years and decreases to 3 after 4.5 years. The number of infected juveniles continues to increase and surpasses the number of susceptible juveniles at 5 years, before stabilizing at a population of 11. The number of infected adults grows exponentially in the first two years before stabilizing at around 21 adults.
+The number of exposed individuals increases slowly during the first year, while the number of infected adults remains constant for the first 6 months before gradually increasing. In the following three years, the rate of increase in susceptible juveniles slows due to mortality, and an increase in the number of exposed juveniles. The number of susceptible adults decreases after the third year due to the increasing number of infected possums.
+
+The number of exposed juveniles stabilizes at around 5 after 5 years, while the number of exposed adults reaches a maximum of 5 after 2.5 years and decreases to 3 after 4.5 years.
+
+The number of infected juveniles continues to increase and surpasses the number of susceptible juveniles at 5 years, before stabilizing at a population of 11. The number of infected adults grows exponentially in the first two years before stabilizing at around 21 adults.
 
 ```{r}
 #| echo: false
